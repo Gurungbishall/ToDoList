@@ -22,24 +22,24 @@ export default function TaskForm({
 
   return (
     <>
-      <div className="w-2/5 pt-6 flex flex-col items-center gap-2">
-        <div className="text-4xl font-bold">Add Task</div>
+      <div className="pt-6 flex flex-col items-center gap-2 ">
+        <div className="text-2xl font-bold sm:text-4xl ">Add Task</div>
         <input
           type="text"
           value={task}
           onChange={(e) => setTask(e.target.value)}
-          className="w-4/5 p-2 text-xl font-bold border-2 border-black"
+          className="w-4/5 p-2 text-sm font-bold border-2 border-black sm:text-xl"
           placeholder="Task Title"
         />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-4/5 p-2 text-xl border-2 border-black"
+          className="w-4/5 p-2 text-sm border-2 border-black sm:text-xl "
           placeholder="Task Description"
         />
         <button
           onClick={AddTask}
-          className="p-2 w-32 text-xl text-white font-bold rounded-xl bg-red-600"
+          className="p-2 w-24 text-sm text-white font-bold rounded-xl bg-red-600 sm:w-32 sm:text-xl"
         >
           Submit
         </button>

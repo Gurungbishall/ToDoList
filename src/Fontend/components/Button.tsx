@@ -12,14 +12,14 @@ export default function Button({
       {state === true ? (
         <button
           onClick={handleEvent}
-          className="p-2 w-36 text-2xl text-white font-bold rounded-xl bg-sky-600"
+          className="p-2 text-sm text-white font-bold rounded-xl bg-sky-600 sm:w-36 sm:text-2xl"
         >
           {name}
         </button>
       ) : (
         <button
           onClick={handleEvent}
-          className="p-2 w-36 text-2xl text-white font-bold rounded-xl bg-black "
+          className="p-2 text-sm text-white font-bold rounded-xl bg-black sm:w-36 sm:text-2xl "
         >
           {name}
         </button>

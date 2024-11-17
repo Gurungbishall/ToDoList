@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Button from "./Fontend/components/Button";
 import TaskForm from "./Fontend/Layout/TaskForm";
 import TaskDisplay from "./Fontend/Layout/TaskDisplay";
@@ -10,63 +10,100 @@ export default function App() {
     { Title: string; Description: string; Complete: boolean }[]
   >([]);
 
-  const [loadingAll, setLoadingAll] = useState(true);
-  const [loadingComplete, setLoadingComplete] = useState(false);
-  const [loadingPending, setLoadingPending] = useState(false);
+  const [loadingState, setLoadingState] = useState({
+    all: true,
+    complete: false,
+    pending: false,
+    create: false,
+  });
+  const [expandedTaskIndex, setExpandedTaskIndex] = useState<number | null>(
+    null
+  );
 
-  const handleCompleteTask = (index: number) => {
+  const handleCompleteTask = useCallback((index: number) => {
     setListOfTasks((prev) =>
       prev.map((T, idx) => (idx === index ? { ...T, Complete: true } : T))
     );
+  }, []);
+
+  const handleDelete = (index: number) => {
+    setListOfTasks((prev) => prev.filter((_, idx) => idx !== index));
   };
 
-  const ShowAll = () => {
-    setLoadingComplete(false);
-    setLoadingPending(false);
-    setLoadingAll(!loadingAll);
-  };
+  const toggleLoadingState = useCallback((state: keyof typeof loadingState) => {
+    setLoadingState((prev) => ({
+      all: state === "all" ? !prev.all : false,
+      complete: state === "complete" ? !prev.complete : false,
+      pending: state === "pending" ? !prev.pending : false,
+      create: state === "create" ? !prev.create : false,
+    }));
+  }, []);
 
-  const ShowComplete = () => {
-    setLoadingAll(false);
-    setLoadingPending(false);
-    setLoadingComplete(!loadingComplete);
-  };
-
-  const ShowPending = () => {
-    setLoadingAll(false);
-    setLoadingComplete(false);
-    setLoadingPending(!loadingPending);
+  const toggleDescription = (index: number) => {
+    setExpandedTaskIndex((prevIndex) => (prevIndex === index ? null : index));
   };
 
   return (
-    <>
-      <div className="p-4 h-screen w-screen flex gap-2 ">
-        <TaskForm OnAddTask={setListOfTasks} />
-        <div className="w-3/5 p-2 ">
-          <div className="flex gap-4 pt-5">
-            <Button name="All" state={loadingAll} handleEvent={ShowAll} />
-            <Button name="Completed" state={loadingComplete} handleEvent={ShowComplete} />
-            <Button name="Pending" state={loadingPending} handleEvent={ShowPending} />
-          </div>
-          <div className="mt-3">
-            {loadingAll ? (
+    <div className="pt-8  h-screen w-screen flex flex-col items-center">
+      <div className="flex gap-4">
+        <Button
+          name="All"
+          state={loadingState.all}
+          handleEvent={() => toggleLoadingState("all")}
+        />
+        <Button
+          name="Completed"
+          state={loadingState.complete}
+          handleEvent={() => toggleLoadingState("complete")}
+        />
+        <Button
+          name="Pending"
+          state={loadingState.pending}
+          handleEvent={() => toggleLoadingState("pending")}
+        />
+        <Button
+          name="Create"
+          state={loadingState.create}
+          handleEvent={() => toggleLoadingState("create")}
+        />
+      </div>
+
+      <div className="w-full mt-3 sm:w-1/2 ">
+        {(loadingState.all ||
+          loadingState.complete ||
+          loadingState.pending ||
+          loadingState.create) && (
+          <>
+            {loadingState.all && (
               <TaskDisplay
                 Tasks={listOfTasks}
                 handleCompleteTask={handleCompleteTask}
+                handleDelete={handleDelete}
+                expandedTaskIndex={expandedTaskIndex}
+                toggleDescription={toggleDescription}
               />
-            ) : null}
-            {loadingComplete ? (
-              <TaskComplete CompleteTasks={listOfTasks} />
-            ) : null}
-            {loadingPending ? (
+            )}
+            {loadingState.complete && (
+              <TaskComplete
+                CompleteTasks={listOfTasks}
+                handleDelete={handleDelete}
+                expandedTaskIndex={expandedTaskIndex}
+                toggleDescription={toggleDescription}
+              />
+            )}
+            {loadingState.pending && (
               <TaskPending
                 PendingTasks={listOfTasks}
                 handleCompleteTask={handleCompleteTask}
+                handleDelete={handleDelete}
+                expandedTaskIndex={expandedTaskIndex}
+                toggleDescription={toggleDescription}
               />
-            ) : null}
-          </div>
-        </div>
+            )}
+            {loadingState.create && <TaskForm OnAddTask={setListOfTasks} />}
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }
